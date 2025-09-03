@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:bluetooth_print_plus/bluetooth_print_plus.dart';
@@ -92,81 +93,6 @@ class CommandTool {
   //   final cmd = await cpclCommand.getCommand();
   //   return cmd;
   // }
-
-  static Future<Uint8List?> cpclTemplateCmd() async {
-    // Komutları temizle
-    await cpclCommand.cleanCommand();
-
-    // Kağıt boyutu ayarla (örnek: 72 dpi * 8 inch genişlik ve yükseklik)
-    await cpclCommand.size(width: 72 * 8, height: 72 * 8);
-
-    // Barkod
-    await cpclCommand.barCode(
-      content: "KP0000000000",
-      x: 10,
-      y: 100,
-      codeType: BarCodeType.c_128,
-      height: 80,
-    );
-
-    // Text alanları
-    await cpclCommand.text(content: "KP0000000000", x: 10, y: 200);
-    await cpclCommand.text(
-      content: "Serkan Çiçek",
-      x: 10,
-      y: 230,
-      bold: true,
-      xMulti: 2,
-      yMulti: 2,
-    );
-
-    await cpclCommand.text(
-      content: "Kabul: GENEL MÜDÜRLÜKLÜK/ANKARA",
-      x: 200,
-      y: 50,
-      bold: true,
-    );
-
-    await cpclCommand.text(
-      content: "30/10/2024 - 09:00:00",
-      x: 200,
-      y: 70,
-    );
-
-    await cpclCommand.text(
-      content: "Poşet Aparat No  : W00280185060",
-      x: 200,
-      y: 90,
-    );
-
-    await cpclCommand.text(
-      content: "PTT A.Ş",
-      x: 10,
-      y: 300,
-      bold: true,
-      xMulti: 2,
-      yMulti: 2,
-    );
-
-    await cpclCommand.text(
-      content: "GÖNDERİCİ: PTT A.Ş",
-      x: 400,
-      y: 150,
-    );
-
-    // Çizgiler
-    await cpclCommand.line(x: 10, y: 350, endX: 550, endY: 350);
-    await cpclCommand.line(x: 10, y: 360, endX: 10, endY: 500);
-
-    // Form: sayfa sonu ve print
-    await cpclCommand.form();
-    await cpclCommand.print();
-
-    // Komutları al
-    final cmd = await cpclCommand.getCommand();
-    return cmd;
-  }
-
   /// escImageCmd
   static Future<Uint8List?> escImageCmd(Uint8List image) async {
     await escCommand.cleanCommand();
@@ -176,6 +102,42 @@ class CommandTool {
     final cmd = await escCommand.getCommand();
     return cmd;
   }
+
+
+  static Future<Uint8List> cpclTemplateCmd() async {
+  // Zebra ZQ220 CPCL formatı
+  String cpcl = """
+! 0 200 200 80 1
+PAGE-WIDTH 576
+BARCODE 128 1 1 50 50 50 KP0000000000
+TEXT 4 0 50 150 KP0000000000
+TEXT 7 0 50 200 Serkan
+LINE 300 100 360 500 2
+FORM
+PRINT
+""";
+
+  // CPCL string → byte array (latin1 daha güvenli)
+  Uint8List bytes = Uint8List.fromList(latin1.encode(cpcl));
+  return bytes;
+  }
+
+  // static Future<Uint8List> cpclTemplateCmd() async {
+  // String cpcl = """
+  // ! 0 200 200 600 1
+  // PAGE-WIDTH 576
+  // BARCODE 128 1 1 50 50 50 KP0000000000
+  // TEXT 4 0 50 150 KP0000000000
+  // TEXT 7 0 50 200 Serkan
+  // LINE 300 100 360 500 2
+  // FORM
+  // PRINT
+  // """;
+  //   Uint8List bytes = Uint8List.fromList(ascii.encode(cpcl));
+  //   return bytes;
+  // }
+
+
 
   static Future<Uint8List?> escTemplateCmd() async {
     await escCommand.cleanCommand();
