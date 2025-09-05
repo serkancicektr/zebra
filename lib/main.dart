@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'dart:async';
 
@@ -204,4 +203,7 @@ class _HomePageState extends State<HomePage> {
       print("onStopPressed error: $e");
     }
   }
+}
+Future<void> requestBluetoothPermissions() async {
+
 }
